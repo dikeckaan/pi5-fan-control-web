@@ -31,7 +31,7 @@ jobs:
       - name: Docker imajını build et
         run: |
           docker build -t dikeckaan/pi5-fan-control-web:latest .
-          docker tag dikeckaan/pi5-fan-control-web:latest ghcr.io/${{ github.repository_owner }}/pi5-fan-control-web:latest
+          docker tag dikeckaan/pi5-fan-control-web:latest ghcr.io/dikeckaan/pi5-fan-control-web:latest
 
       - name: Docker Hub’a push et
         run: |
@@ -39,4 +39,4 @@ jobs:
 
       - name: GHCR’a push et
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/pi5-fan-control-web:latest
+          docker push ghcr.io/dikeckaan/pi5-fan-control-web:latest
