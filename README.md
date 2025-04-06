@@ -2,6 +2,13 @@
 
 Bu proje, Raspberry Pi 5 üzerinde resmi aktif soğutucu (PWM fan) kullanılarak fan kontrolünü sağlayan bir web arayüzüdür. Fan hızını manuel olarak ayarlayabilir veya sıcaklık eşiklerine göre otomatik kontrol yapılandırabilirsiniz.
 
+<p align="center">
+  <img src="photo/light.png" alt="Fan Kontrol Paneli (Aydınlık Tema)" width="600"/>
+</p>
+<p align="center">
+  <img src="photo/dark.png" alt="Fan Kontrol Paneli (Karanlık Tema)" width="600"/>
+</p>
+
 ## 🚀 Özellikler
 
 - Gerçek zamanlı sıcaklık takibi
@@ -52,3 +59,5 @@ gibi ayarları düzenleyebilirsiniz.
 - `templates/index.html` - Web arayüzü şablonu
 - `config.json` - Ayarlar
 - `Dockerfile` & `docker-compose.yml` - Docker kurulumu için gerekli dosyalar
+- `photo/` - Uygulamanın ekran görüntüleri
+```
