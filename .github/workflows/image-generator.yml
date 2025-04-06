@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Push Docker Image (Docker Hub Only)
 
 on:
   push:
@@ -17,26 +17,26 @@ jobs:
       - name: Docker Hub'a giriş yap
         uses: docker/login-action@v3
         with:
-          registry: docker.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: GHCR'a giriş yap
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Docker imajını build et
+      - name: Docker imajını build et ve etiketle
         run: |
           docker build -t dikeckaan/pi5-fan-control-web:latest .
-          docker tag dikeckaan/pi5-fan-control-web:latest ghcr.io/dikeckaan/pi5-fan-control-web:latest
 
       - name: Docker Hub’a push et
         run: |
           docker push dikeckaan/pi5-fan-control-web:latest
 
-      - name: GHCR’a push et
+      - name: Docker Hub README.md'yi imaj açıklaması olarak güncelle
+        env:
+          DOCKERHUB_REPO: dikeckaan/pi5-fan-control-web
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
-          docker push ghcr.io/dikeckaan/pi5-fan-control-web:latest
+          curl -s -X PATCH https://hub.docker.com/v2/repositories/${DOCKERHUB_REPO}/ \
+            -H "Content-Type: application/json" \
+            -H "Authorization: JWT $(curl -s -X POST https://hub.docker.com/v2/users/login/ \
+              -H "Content-Type: application/json" \
+              -d "{\"username\": \"${DOCKERHUB_USERNAME}\", \"password\": \"${DOCKERHUB_TOKEN}\"}" | jq -r .token)" \
+            -d "$(jq -n --arg full_desc "$(cat README.md)" '{"full_description": $full_desc}')"
