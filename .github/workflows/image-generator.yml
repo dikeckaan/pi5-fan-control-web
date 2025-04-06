@@ -1,4 +1,4 @@
-name: Build and Push Docker Image (Docker Hub Only)
+name: Build and Push Docker Image (Docker Hub Only, ARM64)
 
 on:
   push:
@@ -20,13 +20,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Docker imajını build et ve etiketle
-        run: |
-          docker build -t dikeckaan/pi5-fan-control-web:latest .
+      - name: Buildx kur ve etkinleştir
+        uses: docker/setup-buildx-action@v3
 
-      - name: Docker Hub’a push et
-        run: |
-          docker push dikeckaan/pi5-fan-control-web:latest
+      - name: Sadece ARM64 için build et ve pushla
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: dikeckaan/pi5-fan-control-web:latest
 
       - name: Docker Hub README.md'yi imaj açıklaması olarak güncelle
         env:
