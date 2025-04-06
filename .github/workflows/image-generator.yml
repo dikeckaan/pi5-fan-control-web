@@ -3,7 +3,8 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main  # veya kullandığın ana branch
+      - main  # Otomatik tetikleme için
+  workflow_dispatch:  # Manuel tetikleme desteği
 
 jobs:
   build-and-push:
