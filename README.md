@@ -60,4 +60,4 @@ gibi ayarları düzenleyebilirsiniz.
 - `config.json` - Ayarlar
 - `Dockerfile` & `docker-compose.yml` - Docker kurulumu için gerekli dosyalar
 - `photo/` - Uygulamanın ekran görüntüleri
-```
+
