@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html data-theme="dark" lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fan Kontrol Paneli</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<style>
+    body { padding: 2rem; background-color: #f8f9fa; }
+    .card { margin-bottom: 1.5rem; }
+    .range-value { font-weight: bold; margin-left: 0.5rem; }
+  
+  table {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--input-border) !important;
+  }
+
+  thead, th {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+  }
+
+  td {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--input-border) !important;
+  }
+
+  table input {
+    background-color: var(--input-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--input-border) !important;
+  }
+
+  body, .card, .container, .form-control, .form-select, input, select, textarea, .btn, table, th, td {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+
+  #theme-toggle {
+    transition: transform 0.2s ease;
+  }
+
+  #theme-toggle:hover {
+    transform: scale(1.2);
+  }
+
+  /* Geçiş overlay katmanı */
+  #theme-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-color);
+    z-index: 9998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  #theme-toggle {
+    position: fixed;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    z-index: 9999;
+    transition: transform 0.2s ease, rotate 0.4s ease;
+  }
+
+  #theme-toggle:hover {
+    transform: scale(1.2) rotate(15deg);
+  }
+
+  body, .card, .container, .form-control, .form-select, input, select, textarea, .btn, table, th, td {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+  }
+</style>
+</head>
+<body>
+<div id="theme-overlay"></div><span id="theme-toggle">🌙</span>
+<style>
+  :root[data-theme='dark'] {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --card-bg: #0a0a0a;
+    --input-bg: #1a1a1a;
+    --input-border: #333333;
+    --btn-bg: #222;
+  }
+  :root[data-theme='light'] {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --card-bg: #f8f9fa;
+    --input-bg: #ffffff;
+    --input-border: #ced4da;
+    --btn-bg: #e9ecef;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+
+  .card, .container {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+  }
+
+  .form-control, .form-select, input, select, textarea {
+    background-color: var(--input-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--input-border) !important;
+  }
+
+  .btn {
+    background-color: var(--btn-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--input-border) !important;
+  }
+
+  #theme-toggle {
+    position: fixed;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    z-index: 9999;
+  }
+</style>
+<script>
+  const overlay = document.getElementById('theme-overlay');
+  const toggle = document.getElementById('theme-toggle');
+
+  toggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    
+    if (current === next) return;
+
+    overlay.style.opacity = '1';
+    setTimeout(() => {
+      applyTheme(next);
+      overlay.style.opacity = '0';
+    }, 200);
+  });
+
+  const applyTheme = (theme) => {
+    const current = document.documentElement.getAttribute('data-theme');
+    if (current === theme) return;
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    document.getElementById('theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+  };
+
+  const initTheme = () => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+    applyTheme(theme);
+  };
+
+  window.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+  });
+</script>
+<div class="container">
+<h2 class="mb-4 text-center">🌀 Fan Kontrol Paneli</h2>
+<div class="row">
+<div class="col-md-6">
+<div class="card">
+<div class="card-body">
+<h5 class="card-title">🌡️ Anlık Durum</h5>
+<p><strong>Sıcaklık:</strong> <span id="temperature">--</span> °C</p>
+<p><strong>Fan Hızı:</strong> <span id="fan-rpm">--</span> RPM</p>
+<p><strong>Fan Seviyesi:</strong> <span id="fan-level">--</span></p>
+</div>
+</div>
+<div class="card">
+<div class="card-body">
+<h5 class="card-title">⚙️ Mod Seçimi</h5>
+<select class="form-select" id="modeSelect" onchange="updateMode()">
+<option value="auto">Otomatik</option>
+<option value="manual">Manuel</option>
+</select>
+</div>
+</div>
+<div class="card">
+<div class="card-body">
+<h5 class="card-title">🔧 Manuel Fan Seviyesi</h5>
+<input class="form-range" id="manualLevel" max="4" min="0" onchange="updateManualLevel()" type="range"/>
+<div>Seçili Seviye: <span class="range-value" id="manualValue">0</span></div>
+</div>
+</div>
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">🚀 Fan Boost</h5>
+    <div class="row g-2 align-items-center">
+      <div class="col-12 col-lg">
+        <input class="form-control" id="boostDuration" min="1" type="number" value="5"/>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-warning w-100" onclick="boostFan()">🚀 Boost (sn)</button>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-secondary w-100" onclick="cancelBoost()">⛔ İptal Et</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="col-md-6">
+<div class="card">
+<div class="card-body">
+<h5 class="card-title">📈 Otomatik Threshold Ayarları</h5>
+<table class="table table-bordered" id="thresholdTable">
+<thead>
+<tr><th>Sıcaklık (°C)</th><th>Fan Seviyesi</th><th></th></tr>
+</thead>
+<tbody></tbody>
+</table>
+<div class="d-flex justify-content-between">
+<div>
+<button class="btn btn-secondary btn-sm" onclick="addThresholdRow()">+ Yeni Eşik</button>
+<button class="btn btn-success btn-sm" onclick="saveThresholds()">💾 Kaydet</button>
+</div>
+<div>
+<button class="btn btn-outline-danger btn-sm" onclick="resetThresholds()">♻️ Sıfırla</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+    let lastThresholds = {};
+    let allowUpdate = true;
+    let manualEditInProgress = false;
+
+    async function fetchStatus() {
+      if (!allowUpdate || manualEditInProgress) return;
+      const res = await fetch("/status");
+      const data = await res.json();
+      document.getElementById("temperature").innerText = data.temperature.toFixed(1);
+      document.getElementById("fan-level").innerText = data.cur_state;
+      document.getElementById("modeSelect").value = data.mode;
+      document.getElementById("manualLevel").value = data.manual_level;
+      document.getElementById("manualValue").innerText = data.manual_level;
+      if (JSON.stringify(data.auto_thresholds) !== JSON.stringify(lastThresholds)) {
+        loadThresholdTable(data.auto_thresholds);
+        lastThresholds = data.auto_thresholds;
+      }
+    }
+
+    function loadThresholdTable(thresholds) {
+      const tbody = document.querySelector("#thresholdTable tbody");
+      tbody.innerHTML = "";
+      for (const temp in thresholds) {
+        const level = thresholds[temp];
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><input type="number" class="form-control" value="${temp}" oninput="manualEditInProgress = true" /></td>
+          <td><input type="number" class="form-control" value="${level}" min="0" max="4" oninput="manualEditInProgress = true" /></td>
+          <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">🗑️</button></td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+
+    function addThresholdRow() {
+      manualEditInProgress = true;
+      const tbody = document.querySelector("#thresholdTable tbody");
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><input type="number" class="form-control" value="" oninput="manualEditInProgress = true" /></td>
+        <td><input type="number" class="form-control" value="" min="0" max="4" oninput="manualEditInProgress = true" /></td>
+        <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">🗑️</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    async function saveThresholds() {
+      const rows = document.querySelectorAll("#thresholdTable tbody tr");
+      const thresholds = {};
+      rows.forEach(row => {
+        const t = row.children[0].querySelector("input").value;
+        const l = row.children[1].querySelector("input").value;
+        if (t !== "" && l !== "") thresholds[t] = parseInt(l);
+      });
+      await fetch("/set_thresholds", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ thresholds })
+      });
+      lastThresholds = thresholds;
+      manualEditInProgress = false;
+    }
+
+    async function resetThresholds() {
+      const defaultThresholds = {
+        0: 0,
+        50: 1,
+        60: 2,
+        65: 3,
+        70: 4
+      };
+      loadThresholdTable(defaultThresholds);
+      manualEditInProgress = true;
+    }
+
+    async function updateMode() {
+      const mode = document.getElementById("modeSelect").value;
+      await fetch("/set_mode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode })
+      });
+    }
+
+    async function updateManualLevel() {
+      const level = parseInt(document.getElementById("manualLevel").value);
+      document.getElementById("manualValue").innerText = level;
+      await fetch("/set_manual_level", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ level })
+      });
+    }
+
+    async function boostFan() {
+      await fetch("/boost", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seconds: parseInt(document.getElementById("boostDuration").value) || 5 })
+      });
+    }
+
+    setInterval(fetchStatus, 3000);
+    fetchStatus();
+  </script>
+
+<script>
+  function updateFanRPM() {
+    fetch('/api/fan/rpm')
+      .then(response => response.json())
+      .then(data => {
+        const rpmSpan = document.getElementById('fan-rpm');
+        if (rpmSpan && data.rpm !== undefined) {
+          rpmSpan.textContent = data.rpm;
+        }
+      })
+      .catch(error => console.error('RPM verisi alınamadı:', error));
+  }
+
+  setInterval(updateFanRPM, 2000); // 2 saniyede bir güncelle
+  updateFanRPM(); // sayfa yüklenince ilk çekim
+</script>
+
+<script>
+    async function cancelBoost() {
+        try {
+            const res = await fetch("/cancel_boost", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            });
+            const data = await res.json();
+            console.log("İptal sonucu:", data);
+        } catch (err) {
+            console.error("Boost iptal hatası:", err);
+        }
+    }
+</script>
+
+</body>
+</html>

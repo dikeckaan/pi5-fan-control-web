@@ -1,0 +1,12 @@
+
+services:
+  fan-web:
+    build: .
+    container_name: fan-web
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./config.json:/app/config.json
+      - /sys/class/thermal:/sys/class/thermal
+    privileged: true
