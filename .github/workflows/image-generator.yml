@@ -1,0 +1,36 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main  # veya kullandığın ana branch
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repo'yu klonla
+        uses: actions/checkout@v3
+
+      - name: Docker Hub ve GHCR için oturum aç
+        uses: docker/login-action@v3
+        with:
+          registries: |
+            docker.io
+            ghcr.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker imajını build et
+        run: |
+          docker build -t dikeckaan/pi5-fan-control-web:latest .
+          docker tag dikeckaan/pi5-fan-control-web:latest ghcr.io/${{ github.repository_owner }}/pi5-fan-control-web:latest
+
+      - name: Docker Hub’a push et
+        run: |
+          docker push dikeckaan/pi5-fan-control-web:latest
+
+      - name: GHCR’a push et
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/pi5-fan-control-web:latest
