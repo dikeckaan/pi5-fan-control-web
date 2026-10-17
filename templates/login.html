@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Pi 5 Fan Control</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=version) }}">
+  <script src="{{ url_for('static', filename='js/theme.js', v=version) }}"></script>
+</head>
+<body class="login-body">
+  <form class="card login-card" id="login-form">
+    <svg class="brand-icon big" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-fan"/></svg>
+    <h1 data-i18n="app.title">Pi 5 Fan Control</h1>
+    <p class="muted" data-i18n="login.title">Sign in</p>
+    <input class="input" type="password" id="password" autocomplete="current-password" required autofocus data-i18n-placeholder="login.password" data-i18n-aria="login.password">
+    <p class="login-error" id="login-error" role="alert" hidden></p>
+    <button class="btn btn-primary" type="submit" data-i18n="login.submit">Sign in</button>
+    <label class="select-wrap">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-globe"/></svg>
+      <select id="lang-select" data-i18n-aria="header.language"></select>
+    </label>
+  </form>
+  {% include "_icons.html" %}
+  <script src="{{ url_for('static', filename='js/i18n.js', v=version) }}"></script>
+  <script src="{{ url_for('static', filename='js/login.js', v=version) }}"></script>
+</body>
+</html>

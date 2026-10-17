@@ -1,377 +1,172 @@
 <!DOCTYPE html>
-
-<html data-theme="dark" lang="tr">
+<html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Fan Kontrol Paneli</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
-<style>
-    body { padding: 2rem; background-color: #f8f9fa; }
-    .card { margin-bottom: 1.5rem; }
-    .range-value { font-weight: bold; margin-left: 0.5rem; }
-  
-  table {
-    background-color: var(--card-bg) !important;
-    color: var(--text-color) !important;
-    border-color: var(--input-border) !important;
-  }
-
-  thead, th {
-    background-color: var(--card-bg) !important;
-    color: var(--text-color) !important;
-  }
-
-  td {
-    background-color: var(--card-bg) !important;
-    color: var(--text-color) !important;
-    border-color: var(--input-border) !important;
-  }
-
-  table input {
-    background-color: var(--input-bg) !important;
-    color: var(--text-color) !important;
-    border: 1px solid var(--input-border) !important;
-  }
-
-  body, .card, .container, .form-control, .form-select, input, select, textarea, .btn, table, th, td {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-  }
-
-  #theme-toggle {
-    transition: transform 0.2s ease;
-  }
-
-  #theme-toggle:hover {
-    transform: scale(1.2);
-  }
-
-  /* Geçiş overlay katmanı */
-  #theme-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: var(--bg-color);
-    z-index: 9998;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-  }
-
-  #theme-toggle {
-    position: fixed;
-    top: 10px;
-    right: 15px;
-    cursor: pointer;
-    font-size: 1.5rem;
-    z-index: 9999;
-    transition: transform 0.2s ease, rotate 0.4s ease;
-  }
-
-  #theme-toggle:hover {
-    transform: scale(1.2) rotate(15deg);
-  }
-
-  body, .card, .container, .form-control, .form-select, input, select, textarea, .btn, table, th, td {
-    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Pi 5 Fan Control</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=version) }}">
+  <script src="{{ url_for('static', filename='js/theme.js', v=version) }}"></script>
 </head>
 <body>
-<div id="theme-overlay"></div><span id="theme-toggle">🌙</span>
-<style>
-  :root[data-theme='dark'] {
-    --bg-color: #000000;
-    --text-color: #ffffff;
-    --card-bg: #0a0a0a;
-    --input-bg: #1a1a1a;
-    --input-border: #333333;
-    --btn-bg: #222;
-  }
-  :root[data-theme='light'] {
-    --bg-color: #ffffff;
-    --text-color: #000000;
-    --card-bg: #f8f9fa;
-    --input-bg: #ffffff;
-    --input-border: #ced4da;
-    --btn-bg: #e9ecef;
-  }
-
-  body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-  }
-
-  .card, .container {
-    background-color: var(--card-bg) !important;
-    color: var(--text-color) !important;
-  }
-
-  .form-control, .form-select, input, select, textarea {
-    background-color: var(--input-bg) !important;
-    color: var(--text-color) !important;
-    border: 1px solid var(--input-border) !important;
-  }
-
-  .btn {
-    background-color: var(--btn-bg) !important;
-    color: var(--text-color) !important;
-    border-color: var(--input-border) !important;
-  }
-
-  #theme-toggle {
-    position: fixed;
-    top: 10px;
-    right: 15px;
-    cursor: pointer;
-    font-size: 1.5rem;
-    z-index: 9999;
-  }
-</style>
-<script>
-  const overlay = document.getElementById('theme-overlay');
-  const toggle = document.getElementById('theme-toggle');
-
-  toggle.addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    
-    if (current === next) return;
-
-    overlay.style.opacity = '1';
-    setTimeout(() => {
-      applyTheme(next);
-      overlay.style.opacity = '0';
-    }, 200);
-  });
-
-  const applyTheme = (theme) => {
-    const current = document.documentElement.getAttribute('data-theme');
-    if (current === theme) return;
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-    document.getElementById('theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
-  };
-
-  const initTheme = () => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-    applyTheme(theme);
-  };
-
-  window.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-  });
-</script>
-<div class="container">
-<h2 class="mb-4 text-center">🌀 Fan Kontrol Paneli</h2>
-<div class="row">
-<div class="col-md-6">
-<div class="card">
-<div class="card-body">
-<h5 class="card-title">🌡️ Anlık Durum</h5>
-<p><strong>Sıcaklık:</strong> <span id="temperature">--</span> °C</p>
-<p><strong>Fan Hızı:</strong> <span id="fan-rpm">--</span> RPM</p>
-<p><strong>Fan Seviyesi:</strong> <span id="fan-level">--</span></p>
-</div>
-</div>
-<div class="card">
-<div class="card-body">
-<h5 class="card-title">⚙️ Mod Seçimi</h5>
-<select class="form-select" id="modeSelect" onchange="updateMode()">
-<option value="auto">Otomatik</option>
-<option value="manual">Manuel</option>
-</select>
-</div>
-</div>
-<div class="card">
-<div class="card-body">
-<h5 class="card-title">🔧 Manuel Fan Seviyesi</h5>
-<input class="form-range" id="manualLevel" max="4" min="0" onchange="updateManualLevel()" type="range"/>
-<div>Seçili Seviye: <span class="range-value" id="manualValue">0</span></div>
-</div>
-</div>
-<div class="card">
-  <div class="card-body">
-    <h5 class="card-title">🚀 Fan Boost</h5>
-    <div class="row g-2 align-items-center">
-      <div class="col-12 col-lg">
-        <input class="form-control" id="boostDuration" min="1" type="number" value="5"/>
-      </div>
-      <div class="col-auto">
-        <button class="btn btn-warning w-100" onclick="boostFan()">🚀 Boost (sn)</button>
-      </div>
-      <div class="col-auto">
-        <button class="btn btn-secondary w-100" onclick="cancelBoost()">⛔ İptal Et</button>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-fan"/></svg>
+      <div>
+        <h1 data-i18n="app.title">Pi 5 Fan Control</h1>
+        <p class="muted small" data-i18n="app.subtitle">Raspberry Pi 5 Active Cooler</p>
       </div>
     </div>
-  </div>
-</div>
-</div>
-<div class="col-md-6">
-<div class="card">
-<div class="card-body">
-<h5 class="card-title">📈 Otomatik Threshold Ayarları</h5>
-<table class="table table-bordered" id="thresholdTable">
-<thead>
-<tr><th>Sıcaklık (°C)</th><th>Fan Seviyesi</th><th></th></tr>
-</thead>
-<tbody></tbody>
-</table>
-<div class="d-flex justify-content-between">
-<div>
-<button class="btn btn-secondary btn-sm" onclick="addThresholdRow()">+ Yeni Eşik</button>
-<button class="btn btn-success btn-sm" onclick="saveThresholds()">💾 Kaydet</button>
-</div>
-<div>
-<button class="btn btn-outline-danger btn-sm" onclick="resetThresholds()">♻️ Sıfırla</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<script>
-    let lastThresholds = {};
-    let allowUpdate = true;
-    let manualEditInProgress = false;
+    <div class="topbar-actions">
+      <span class="pill" id="reason-pill"><span class="dot"></span><span id="reason-text">…</span></span>
+      <label class="select-wrap" data-i18n-title="header.language">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-globe"/></svg>
+        <select id="lang-select" data-i18n-aria="header.language"></select>
+      </label>
+      <button class="icon-btn" id="theme-btn" type="button" data-i18n-title="header.theme" data-i18n-aria="header.theme">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-theme"/></svg>
+      </button>
+      {% if auth_enabled %}
+      <button class="icon-btn" id="logout-btn" type="button" data-i18n-title="header.logout" data-i18n-aria="header.logout">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-logout"/></svg>
+      </button>
+      {% endif %}
+    </div>
+  </header>
 
-    async function fetchStatus() {
-      if (!allowUpdate || manualEditInProgress) return;
-      const res = await fetch("/status");
-      const data = await res.json();
-      document.getElementById("temperature").innerText = data.temperature.toFixed(1);
-      document.getElementById("fan-level").innerText = data.cur_state;
-      document.getElementById("modeSelect").value = data.mode;
-      document.getElementById("manualLevel").value = data.manual_level;
-      document.getElementById("manualValue").innerText = data.manual_level;
-      if (JSON.stringify(data.auto_thresholds) !== JSON.stringify(lastThresholds)) {
-        loadThresholdTable(data.auto_thresholds);
-        lastThresholds = data.auto_thresholds;
-      }
-    }
+  <div id="offline" class="banner banner-critical" hidden data-i18n="status.offline"></div>
+  <div id="alarms" class="alarms" aria-live="polite"></div>
 
-    function loadThresholdTable(thresholds) {
-      const tbody = document.querySelector("#thresholdTable tbody");
-      tbody.innerHTML = "";
-      for (const temp in thresholds) {
-        const level = thresholds[temp];
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td><input type="number" class="form-control" value="${temp}" oninput="manualEditInProgress = true" /></td>
-          <td><input type="number" class="form-control" value="${level}" min="0" max="4" oninput="manualEditInProgress = true" /></td>
-          <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">🗑️</button></td>
-        `;
-        tbody.appendChild(row);
-      }
-    }
+  <main class="grid">
+    <section class="card card-gauge">
+      <div class="gauge" id="gauge">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <path class="gauge-track" d="M 38.7 161.3 A 86 86 0 1 1 161.3 161.3"/>
+          <path class="gauge-value" id="gauge-arc" pathLength="100" d="M 38.7 161.3 A 86 86 0 1 1 161.3 161.3"/>
+          <line class="gauge-mark" id="gauge-emergency" x1="0" y1="0" x2="0" y2="0"/>
+        </svg>
+        <div class="gauge-center">
+          <div class="gauge-label" data-i18n="status.temperature">Temperature</div>
+          <div class="gauge-temp"><span id="temp">--</span><small>°C</small></div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label" data-i18n="status.fanSpeed">Fan speed</div>
+          <div class="stat-value"><svg class="spin" id="fan-spin" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-fan"/></svg><span id="rpm">--</span> <small data-i18n="status.rpm">RPM</small></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label" data-i18n="status.level">Level</div>
+          <div class="stat-value"><div class="level-bars" id="level-bars"></div><span id="level">--</span></div>
+        </div>
+      </div>
+    </section>
 
-    function addThresholdRow() {
-      manualEditInProgress = true;
-      const tbody = document.querySelector("#thresholdTable tbody");
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td><input type="number" class="form-control" value="" oninput="manualEditInProgress = true" /></td>
-        <td><input type="number" class="form-control" value="" min="0" max="4" oninput="manualEditInProgress = true" /></td>
-        <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">🗑️</button></td>
-      `;
-      tbody.appendChild(row);
-    }
+    <section class="card card-history">
+      <div class="card-head">
+        <h2 data-i18n="history.title">History</h2>
+        <div class="segmented small" id="history-range" role="group">
+          <button type="button" data-min="5"></button>
+          <button type="button" data-min="15"></button>
+          <button type="button" data-min="30"></button>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i class="swatch swatch-temp"></i><span data-i18n="history.temp">Temperature</span></span>
+        <span><i class="swatch swatch-rpm"></i><span data-i18n="history.rpm">Fan speed</span></span>
+      </div>
+      <div class="chart-box"><canvas id="history-chart"></canvas><div class="chart-tip" id="history-tip" hidden></div></div>
+    </section>
 
-    async function saveThresholds() {
-      const rows = document.querySelectorAll("#thresholdTable tbody tr");
-      const thresholds = {};
-      rows.forEach(row => {
-        const t = row.children[0].querySelector("input").value;
-        const l = row.children[1].querySelector("input").value;
-        if (t !== "" && l !== "") thresholds[t] = parseInt(l);
-      });
-      await fetch("/set_thresholds", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ thresholds })
-      });
-      lastThresholds = thresholds;
-      manualEditInProgress = false;
-    }
+    <section class="card card-control">
+      <h2 data-i18n="control.title">Control</h2>
+      <div class="field">
+        <span class="field-label" data-i18n="control.mode">Mode</span>
+        <div class="segmented" id="mode-switch" role="radiogroup">
+          <button type="button" role="radio" data-mode="auto" data-i18n="mode.auto">Auto</button>
+          <button type="button" role="radio" data-mode="manual" data-i18n="mode.manual">Manual</button>
+        </div>
+      </div>
+      <div class="field" id="manual-field">
+        <span class="field-label" data-i18n="control.manualLevel">Manual level</span>
+        <div class="level-picker" id="level-picker" role="radiogroup"></div>
+        <p class="hint" data-i18n="control.manualHint"></p>
+      </div>
+      <div class="field">
+        <span class="field-label" data-i18n="boost.title">Boost</span>
+        <div class="boost-row">
+          <div class="chips" id="boost-presets">
+            <button type="button" class="chip" data-s="15">15s</button>
+            <button type="button" class="chip" data-s="30">30s</button>
+            <button type="button" class="chip" data-s="60">60s</button>
+            <button type="button" class="chip" data-s="300">5m</button>
+          </div>
+          <input type="number" id="boost-seconds" min="1" max="600" value="30" class="input input-sm" data-i18n-aria="boost.seconds">
+          <button type="button" class="btn btn-accent" id="boost-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bolt"/></svg><span data-i18n="boost.start">Boost</span></button>
+          <button type="button" class="btn" id="boost-cancel" hidden data-i18n="boost.cancel">Cancel</button>
+        </div>
+        <div class="boost-progress" id="boost-progress" hidden><div id="boost-bar"></div><span id="boost-left"></span></div>
+        <p class="hint" data-i18n="boost.hint"></p>
+      </div>
+    </section>
 
-    async function resetThresholds() {
-      const defaultThresholds = {
-        0: 0,
-        50: 1,
-        60: 2,
-        65: 3,
-        70: 4
-      };
-      loadThresholdTable(defaultThresholds);
-      manualEditInProgress = true;
-    }
+    <section class="card card-curve">
+      <div class="card-head">
+        <h2 data-i18n="curve.title">Fan curve</h2>
+        <span class="badge" id="curve-dirty" hidden data-i18n="curve.unsaved">Unsaved changes</span>
+      </div>
+      <p class="hint" data-i18n="curve.hint"></p>
+      <div class="chart-box chart-curve"><canvas id="curve-chart" tabindex="0"></canvas></div>
+      <div class="curve-bottom">
+        <table class="table" id="curve-table">
+          <thead><tr><th data-i18n="curve.temp">Temperature (°C)</th><th data-i18n="curve.level">Level</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="actions">
+          <button type="button" class="btn" id="curve-add"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="curve.add">Add point</span></button>
+          <button type="button" class="btn btn-ghost" id="curve-defaults" data-i18n="curve.defaults">Defaults</button>
+          <button type="button" class="btn btn-ghost" id="curve-revert" data-i18n="curve.revert">Revert</button>
+          <button type="button" class="btn btn-primary" id="curve-save" data-i18n="curve.save">Save curve</button>
+        </div>
+      </div>
+    </section>
 
-    async function updateMode() {
-      const mode = document.getElementById("modeSelect").value;
-      await fetch("/set_mode", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode })
-      });
-    }
+    <section class="card card-safety">
+      <h2><svg class="h-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg><span data-i18n="safety.title">Protection</span></h2>
+      <form id="safety-form" class="safety" novalidate>
+        <label class="num-field"><span data-i18n="safety.emergency_temp"></span><input class="input" type="number" name="emergency_temp" min="60" max="90" required><small class="hint" data-i18n="safety.emergency_temp.hint"></small></label>
+        <label class="num-field"><span data-i18n="safety.manual_override_temp"></span><input class="input" type="number" name="manual_override_temp" min="45" max="90" required><small class="hint" data-i18n="safety.manual_override_temp.hint"></small></label>
+        <label class="num-field"><span data-i18n="safety.hysteresis"></span><input class="input" type="number" name="hysteresis" min="0" max="15" required><small class="hint" data-i18n="safety.hysteresis.hint"></small></label>
+        <label class="num-field"><span data-i18n="safety.min_change_interval"></span><input class="input" type="number" name="min_change_interval" min="0" max="300" required><small class="hint" data-i18n="safety.min_change_interval.hint"></small></label>
+        <label class="switch-field"><input type="checkbox" name="stall_detection"><span class="switch" aria-hidden="true"></span><span><span data-i18n="safety.stall_detection"></span><small class="hint" data-i18n="safety.stall_detection.hint"></small></span></label>
+        <label class="switch-field"><input type="checkbox" name="spinup_kick"><span class="switch" aria-hidden="true"></span><span><span data-i18n="safety.spinup_kick"></span><small class="hint" data-i18n="safety.spinup_kick.hint"></small></span></label>
+        <div class="actions"><button type="submit" class="btn btn-primary" data-i18n="safety.save">Save protection</button></div>
+      </form>
+    </section>
 
-    async function updateManualLevel() {
-      const level = parseInt(document.getElementById("manualLevel").value);
-      document.getElementById("manualValue").innerText = level;
-      await fetch("/set_manual_level", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ level })
-      });
-    }
+    <section class="card card-backup">
+      <h2 data-i18n="backup.title">Backup</h2>
+      <p class="hint" data-i18n="backup.hint"></p>
+      <div class="actions">
+        <a class="btn" id="export-btn" href="{{ url_for('export_config') }}" download><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-download"/></svg><span data-i18n="backup.export">Export</span></a>
+        <label class="btn"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-upload"/></svg><span data-i18n="backup.import">Import</span><input type="file" id="import-file" accept="application/json,.json" hidden></label>
+      </div>
+    </section>
 
-    async function boostFan() {
-      await fetch("/boost", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ seconds: parseInt(document.getElementById("boostDuration").value) || 5 })
-      });
-    }
+    <section class="card card-events">
+      <h2 data-i18n="events.title">Events</h2>
+      <ul class="events" id="events"></ul>
+    </section>
+  </main>
 
-    setInterval(fetchStatus, 3000);
-    fetchStatus();
-  </script>
+  <footer class="footer muted small">pi5-fan-control-web v{{ version }} · <span data-i18n="status.uptime">Uptime</span> <span id="uptime">--</span></footer>
 
-<script>
-  function updateFanRPM() {
-    fetch('/api/fan/rpm')
-      .then(response => response.json())
-      .then(data => {
-        const rpmSpan = document.getElementById('fan-rpm');
-        if (rpmSpan && data.rpm !== undefined) {
-          rpmSpan.textContent = data.rpm;
-        }
-      })
-      .catch(error => console.error('RPM verisi alınamadı:', error));
-  }
+  <div class="toasts" id="toasts" aria-live="assertive"></div>
 
-  setInterval(updateFanRPM, 2000); // 2 saniyede bir güncelle
-  updateFanRPM(); // sayfa yüklenince ilk çekim
-</script>
-
-<script>
-    async function cancelBoost() {
-        try {
-            const res = await fetch("/cancel_boost", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" }
-            });
-            const data = await res.json();
-            console.log("İptal sonucu:", data);
-        } catch (err) {
-            console.error("Boost iptal hatası:", err);
-        }
-    }
-</script>
-
+  {% include "_icons.html" %}
+  <script src="{{ url_for('static', filename='js/i18n.js', v=version) }}"></script>
+  <script src="{{ url_for('static', filename='js/charts.js', v=version) }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js', v=version) }}"></script>
 </body>
 </html>
