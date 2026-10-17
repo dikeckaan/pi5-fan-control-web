@@ -1,0 +1,7 @@
+.git
+.github
+data
+photo
+tests
+**/__pycache__
+*.pyc
